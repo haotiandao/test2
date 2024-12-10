@@ -1,4 +1,4 @@
-ip_version_priority = "ipv4"
+ip_version_priority = "ipv6"
 
 source_urls = [
     "https://ghproxy.net/https://raw.githubusercontent.com/haotiandao/cs/main/S_weishi.txt",
