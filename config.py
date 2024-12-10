@@ -3,6 +3,7 @@ ip_version_priority = "ipv4"
 source_urls = [
     "https://ghproxy.net/https://raw.githubusercontent.com/haotiandao/cs/main/S_weishi.txt",
     "https://haotian.us.kg",
+    "https://haot.us.kg",
 
 ]
 
