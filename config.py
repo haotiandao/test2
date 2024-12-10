@@ -1,8 +1,8 @@
-ip_version_priority = "ipv6"
+ip_version_priority = "ipv4"
 
 source_urls = [
     "https://ghproxy.net/https://raw.githubusercontent.com/haotiandao/cs/main/S_weishi.txt",
-    "https://live.fanmingming.com/tv/m3u/ipv6.m3u",
+    "https://haotian.us.kg",
 
 ]
 
