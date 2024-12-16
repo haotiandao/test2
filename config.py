@@ -38,9 +38,7 @@ source_urls = [
 "https://raw.githubusercontent.com/cymz6/AutoIPTV-Hotel/main/lives.txt",
 "https://raw.githubusercontent.com/PizazzGY/TVBox_warehouse/main/live.txt",
 "https://raw.githubusercontent.com/kimwang1978/collect-tv-txt/main/merged_output.txt"
-    "https://haotian.us.kg",
-    "https://haot.us.kg",
-
+ 
 ]
 
 url_blacklist = [
