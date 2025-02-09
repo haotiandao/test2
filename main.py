@@ -4,25 +4,7 @@ import logging
 from collections import OrderedDict
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
-
-# 默认配置
-config = {
-    "source_urls": [
-        "http://example.com/channels.m3u",
-        "http://example.com/channels.txt"
-    ],
-    "epg_urls": ["http://example.com/epg.xml"],
-    "announcements": [
-        {
-            "channel": "Announcement",
-            "entries": [
-                {"name": None, "logo": "http://example.com/logo.png", "url": "http://example.com/stream"}
-            ]
-        }
-    ],
-    "ip_version_priority": "ipv4",
-    "url_blacklist": ["blacklisted_url"]
-}
+import config
 
 # 配置日志记录
 logging.basicConfig(
@@ -157,8 +139,7 @@ def sort_and_filter_channels(channels):
 
     for category, channel_list in channels.items():
         sorted_channels[category] = {}
-        for channel_name, online_channel_urls in channel_list.items():
-            urls = [url for _, url in online_channel_urls]
+        for channel_name, urls in channel_list.items():
             # 并发测速
             timed_urls = get_timed_urls(urls)
             timed_urls.sort(key=lambda x: x[0])  # 按响应时间排序
@@ -279,12 +260,11 @@ def updateChannelUrlsM3U(channels, template_channels):
 
                                 f_m3u.write(f"#EXTINF:-1 tvg-id=\"{index}\" tvg-name=\"{channel_name}\" tvg-logo=\"https://gcore.jsdelivr.net/gh/yuanzl77/TVlogo@master/png/{channel_name}.png\" group-title=\"{category}\",{channel_name}\n")
                                 f_m3u.write(new_url + "\n")
+                                f_txt.write(f"{channel_name},{new_url}\n")
 
-# 示例调用
+            f_txt.write("\n")
+
 if __name__ == "__main__":
-    template_file = "template.txt"
-    sorted_matched_channels, template_channels = filter_source_urls(template_file)
-    updateChannelUrlsM3U(sorted_matched_channels, template_channels)
-
-
-
+    template_file = "demo.txt"
+    channels, template_channels = filter_source_urls(template_file)
+    updateChannelUrlsM3U(channels, template_channels)
