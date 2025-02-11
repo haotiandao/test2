@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
   
-    pip install yt-dlp
 
     steps:
     - name: Checkout repository
