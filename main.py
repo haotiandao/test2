@@ -5,6 +5,7 @@ from collections import OrderedDict
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 import config
+import yt_dlp
 
 # 配置日志记录
 logging.basicConfig(
@@ -100,20 +101,26 @@ def fetch_channels(url):
 
     return channels
 
-def measure_speed(url):
+def measure_speed_with_ytdlp(url):
     """
-    测量给定URL的响应时间。
+    使用 yt-dlp 测量给定URL的响应时间。
     
     :param url: 要测量速度的URL
     :return: 响应时间（秒），如果请求失败则返回无穷大
     """
+    ydl_opts = {
+        'quiet': True,
+        'simulate': True,
+        'dump_single_json': True,
+        'no_warnings': True,
+    }
     try:
         start_time = datetime.now()
-        response = requests.head(url, timeout=5)  # 设置超时时间为1秒
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.extract_info(url, download=False)
         end_time = datetime.now()
-        response.raise_for_status()
         return (end_time - start_time).total_seconds()
-    except requests.RequestException:
+    except Exception:
         return float('inf')  # 如果请求失败，返回无穷大以确保其排在最后
 
 def sort_and_filter_channels(channels):
@@ -134,12 +141,13 @@ def sort_and_filter_channels(channels):
         :return: 包含响应时间和URL的元组列表
         """
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            timed_urls = list(executor.map(measure_speed, urls))
+            timed_urls = list(executor.map(measure_speed_with_ytdlp, urls))
         return [(time, url) for time, url in zip(timed_urls, urls)]
 
     for category, channel_list in channels.items():
         sorted_channels[category] = {}
-        for channel_name, urls in channel_list.items():
+        for channel_name, online_channel_urls in channel_list.items():
+            urls = [url for _, url in online_channel_urls]
             # 并发测速
             timed_urls = get_timed_urls(urls)
             timed_urls.sort(key=lambda x: x[0])  # 按响应时间排序
@@ -260,11 +268,6 @@ def updateChannelUrlsM3U(channels, template_channels):
 
                                 f_m3u.write(f"#EXTINF:-1 tvg-id=\"{index}\" tvg-name=\"{channel_name}\" tvg-logo=\"https://gcore.jsdelivr.net/gh/yuanzl77/TVlogo@master/png/{channel_name}.png\" group-title=\"{category}\",{channel_name}\n")
                                 f_m3u.write(new_url + "\n")
-                                f_txt.write(f"{channel_name},{new_url}\n")
 
-            f_txt.write("\n")
 
-if __name__ == "__main__":
-    template_file = "demo.txt"
-    channels, template_channels = filter_source_urls(template_file)
-    updateChannelUrlsM3U(channels, template_channels)
+
