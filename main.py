@@ -3,10 +3,9 @@ import requests
 import logging
 from collections import OrderedDict
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
 import config
-pip install yt-dlp
 import yt_dlp
+from concurrent.futures import ThreadPoolExecutor
 
 # 配置日志记录
 logging.basicConfig(
@@ -124,9 +123,9 @@ def measure_speed_with_ytdlp(url):
     except Exception:
         return float('inf')  # 如果请求失败，返回无穷大以确保其排在最后
 
-def sort_and_filter_channels(channels):
+def sort_and_filter_ipv4_channels(channels):
     """
-    对频道URL进行测速并排序，筛选出最快的前20个URL。
+    对频道URL进行测速并排序，筛选出最快的前10个IPv4 URL。
     
     :param channels: 包含频道分类和频道URL的有序字典
     :return: 排序并筛选后的频道URL
@@ -148,13 +147,13 @@ def sort_and_filter_channels(channels):
     for category, channel_list in channels.items():
         sorted_channels[category] = {}
         for channel_name, online_channel_urls in channel_list.items():
-            urls = [url for _, url in online_channel_urls]
+            ipv4_urls = [url for _, url in online_channel_urls if not is_ipv6(url)]
             # 并发测速
-            timed_urls = get_timed_urls(urls)
+            timed_urls = get_timed_urls(ipv4_urls)
             timed_urls.sort(key=lambda x: x[0])  # 按响应时间排序
-            # 取前20个最快的URL
-            top_20_urls = [url for _, url in timed_urls[:20]]
-            sorted_channels[category][channel_name] = top_20_urls
+            # 取前10个最快的IPv4 URL
+            top_10_ipv4_urls = [url for _, url in timed_urls[:10]]
+            sorted_channels[category][channel_name] = top_10_ipv4_urls
     return sorted_channels
 
 def match_channels(template_channels, all_channels):
@@ -200,7 +199,7 @@ def filter_source_urls(template_file):
     matched_channels = match_channels(template_channels, all_channels)
 
     # 对匹配到的渠道进行测速和筛选
-    sorted_matched_channels = sort_and_filter_channels(matched_channels)
+    sorted_matched_channels = sort_and_filter_ipv4_channels(matched_channels)
 
     return sorted_matched_channels, template_channels
 
@@ -269,6 +268,14 @@ def updateChannelUrlsM3U(channels, template_channels):
 
                                 f_m3u.write(f"#EXTINF:-1 tvg-id=\"{index}\" tvg-name=\"{channel_name}\" tvg-logo=\"https://gcore.jsdelivr.net/gh/yuanzl77/TVlogo@master/png/{channel_name}.png\" group-title=\"{category}\",{channel_name}\n")
                                 f_m3u.write(new_url + "\n")
+                                f_txt.write(f"{channel_name},{new_url}\n")
+
+            f_txt.write("\n")
+
+if __name__ == "__main__":
+    template_file = "demo.txt"
+    channels, template_channels = filter_source_urls(template_file)
+    updateChannelUrlsM3U(channels, template_channels)
 
 
 
