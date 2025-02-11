@@ -11,6 +11,9 @@ jobs:
   run_script:
     runs-on: ubuntu-latest
 
+    run:
+    pip install yt-dlp
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
