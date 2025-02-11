@@ -11,7 +11,7 @@ jobs:
   run_script:
     runs-on: ubuntu-latest
 
-    run:
+  
     pip install yt-dlp
 
     steps:
