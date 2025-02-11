@@ -5,6 +5,7 @@ from collections import OrderedDict
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 import config
+pip install yt-dlp
 import yt_dlp
 
 # 配置日志记录
