@@ -92,7 +92,7 @@ def filter_source_urls(template_file):
     template_channels = parse_template(template_file)
     source_urls = [
         "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u",
-        "http://example.com/channels.txt"  # 添加其他源URL
+        "https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt"  # 添加其他源URL
     ]
 
     all_channels = OrderedDict()
